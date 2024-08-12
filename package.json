@@ -37,5 +37,11 @@
   "bugs": {
     "url": "https://github.com/endnetwork/end-node/issues"
   },
-  "homepage": "https://github.com/endnetwork/end-node#readme"
+  "homepage": "https://github.com/endnetwork/end-node#readme",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "fastify": "^4.28.1",
+    "level": "^8.0.1",
+    "ws": "^8.18.0"
+  }
 }
