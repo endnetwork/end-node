@@ -1,0 +1,41 @@
+{
+  "name": "end-node",
+  "version": "1.0.0",
+  "description": "end-node is a core component of the END NETWORK. It serves as the node software that enables seamless interaction with the END NETWORK, facilitating blockchain operations, managing transactions, and participating in network consensus.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/endnetwork/end-node.git"
+  },
+  "keywords": [
+    "END NETWORK",
+    "blockchain node",
+    "node software",
+    "blockchain interaction",
+    "consensus mechanism",
+    "network management",
+    "cryptographic security",
+    "node operations",
+    "distributed ledger",
+    "blockchain technology",
+    "node initialization",
+    "node configuration",
+    "blockchain integration",
+    "network syncing",
+    "decentralized network",
+    "node API",
+    "node management tools",
+    "transaction handling",
+    "mainnet node",
+    "testnet node"
+  ],
+  "author": "END NETWORK",
+  "license": "Apache License 2.0",
+  "bugs": {
+    "url": "https://github.com/endnetwork/end-node/issues"
+  },
+  "homepage": "https://github.com/endnetwork/end-node#readme"
+}
