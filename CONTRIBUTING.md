@@ -10,7 +10,7 @@ Thank you for considering contributing to END Network! We welcome contributions 
 2. **Clone Your Fork**
    - Clone your fork to your local machine:
      ```sh
-     git clone https://github.com/your-username/end-node.git
+     git clone https://github.com/endnetwork/end-node.git
      ```
    - Navigate into the project directory:
      ```sh
