@@ -33,7 +33,7 @@
     "testnet node"
   ],
   "author": "END NETWORK",
-  "license": "Apache License 2.0",
+  "license": "LGPL-3.0 license",
   "bugs": {
     "url": "https://github.com/endnetwork/end-node/issues"
   },
