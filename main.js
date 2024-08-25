@@ -8,7 +8,7 @@ const config = {
         "ws://192.168.29.213:10507",
         "ws://192.168.29.213:10508"
     ],
-    MAX_PEERS: 10,
+    MAX_PEERS: process.env.MAX_PEERS || 10,
     PRIVATE_KEY: "",
     ENABLE_LOGGING: true,
     ENABLE_RPC: true,
