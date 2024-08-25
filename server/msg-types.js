@@ -5,7 +5,7 @@ const TYPE = {
     SEND_BLOCK: 3,
     HANDSHAKE: 4,
     PEER_LIST: 5,
-    SYNCHRONIZATION: 6, 
+    REQUEST_CHAIN: 6, 
 }
 
 

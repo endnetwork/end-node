@@ -1,12 +1,33 @@
 const WS = require("ws");
-const {Level} = require('level');
 const createHTTPServer = require('../rpc/rpc');
 const {TYPE, produceMessage, parseJSON} = require("./msg-types");
-
+const Blockchain = require('../blockchain/Chain');
 
 const opened    = [];  // Addresses and sockets from connected nodes.
 const connected = [];  // Addresses from connected nodes.
 let connectedNodes = 0;
+let blockchain;
+
+function broadcastLatestBlock() {
+    blockchain.getLatestBlock().then(block => {
+        console.log(`\x1b[32mLOG\x1b[0m Broadcasting block:`, block);
+
+        // Loop through all connected peers and send the latest block
+        connected.forEach(peerAddress => {
+            const peer = opened.find(p => p.address === peerAddress);
+            if (peer) {
+                console.log(`\x1b[32mLOG\x1b[0m Sending block to ${peer.address}`);
+                peer.socket.send(produceMessage(TYPE.SEND_BLOCK, block));
+            } else {
+                console.error(`\x1b[31mERROR\x1b[0m No open connection found for peer: ${peerAddress}`);
+            }
+        });
+    }).catch(error => {
+        console.error("Error broadcasting latest block:", error);
+    });
+}
+
+
 
 function connect(MY_ADDRESS, address, retryCount = 0) {
     if (!connected.find(peerAddress => peerAddress === address) && address !== MY_ADDRESS) {
@@ -18,6 +39,9 @@ function connect(MY_ADDRESS, address, retryCount = 0) {
             for (const _address of [MY_ADDRESS, ...connected]) socket.send(produceMessage(TYPE.HANDSHAKE, _address));
             for (const node of opened) node.socket.send(produceMessage(TYPE.HANDSHAKE, address));
             socket.send(produceMessage(TYPE.PEER_LIST, connected))
+            const getBlockIndex = await blockchain.getLatestBlockIndex();
+            socket.send(produceMessage(TYPE.REQUEST_CHAIN, getBlockIndex));
+
 
             // If the address already existed in "connected" or "opened", we will not push, preventing duplications.
             if (!opened.find(peer => peer.address === address) && address !== MY_ADDRESS) {
@@ -65,6 +89,15 @@ async function startServer(options) {
     const GENESIS_HASH         = options.GENESIS_HASH || ""; 
     // Genesis block's hash
 
+    blockchain = new Blockchain('./myBlockchainDB');
+    await blockchain.loadBlockchain();
+
+    if (blockchain.chain.length === 0) {
+        console.log(`\x1b[32mLOG\x1b[0m [${(new Date()).toISOString()}] No Chain Found adding GenesisBlock`, PORT.toString());
+        await blockchain.createGenesisBlock();
+    } 
+
+
     const server = new WS.Server({ port: PORT });
     console.log(`\x1b[32mLOG\x1b[0m [${(new Date()).toISOString()}] P2P server listening on PORT`, PORT.toString());
 
@@ -92,10 +125,31 @@ async function startServer(options) {
                     });
                     break;
 
-                case TYPE.REQUEST_BLOCK:
+                case TYPE.REQUEST_CHAIN:
+                    const _blockIndex = _message.data;
+                    const block = await blockchain.getBlockByIndex(_blockIndex);
+                    if (block) {
+                        console.log("Recived BLOCKED REQUEST");
+                        socket.send(produceMessage(TYPE.SEND_BLOCK, block));
+                    }
+
                     break;
 
                 case TYPE.SEND_BLOCK:
+                    const receivedBlock = _message.data;
+                    const latestBlock = await blockchain.getLatestBlock();
+
+                    if (latestBlock.index < receivedBlock.index) {
+                        const isValid = await blockchain.isChainValid();
+                        if (isValid) {
+                            await blockchain.addBlock(receivedBlock);
+                            broadcastLatestBlock(); // Broadcast the new block to all peers
+                        } else {
+                            console.log('Received block is invalid.');
+                        }
+                    } else {
+                        console.log('Received block is updated.');
+                    }
                     break;
 
             }
@@ -109,7 +163,10 @@ async function startServer(options) {
 
 
     if (ENABLE_RPC) {
-        createHTTPServer(RPC_PORT, connected);
+        const block = await blockchain.getLatestBlock();
+        console.log(block);
+        createHTTPServer(RPC_PORT, connected, blockchain, broadcastLatestBlock);
+        
     }
 }
 
