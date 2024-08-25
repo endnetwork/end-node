@@ -65,8 +65,6 @@ async function startServer(options) {
     const GENESIS_HASH         = options.GENESIS_HASH || ""; 
     // Genesis block's hash
 
-    createHTTPServer(PORT+ 1000, connected);
-
     const server = new WS.Server({ port: PORT });
     console.log(`\x1b[32mLOG\x1b[0m [${(new Date()).toISOString()}] P2P server listening on PORT`, PORT.toString());
 
@@ -75,16 +73,13 @@ async function startServer(options) {
             const _message = parseJSON(message);  
 
             switch (_message.type) {
-
                 case TYPE.HANDSHAKE:
                     const address = _message.data;
 
                     if (connectedNodes <= MAX_PEERS) {
                         try {
                             connect(MY_ADDRESS, address);
-                        } catch(e) {
-                            // Debug console.log(e);
-                        }
+                        } catch(e) {}
                     }
                     break;
 
@@ -111,6 +106,11 @@ async function startServer(options) {
     try {
         PEERS.forEach(peer => connect(MY_ADDRESS, peer)); // Connect to peers
     } catch(e) {}
+
+
+    if (ENABLE_RPC) {
+        createHTTPServer(RPC_PORT, connected);
+    }
 }
 
 

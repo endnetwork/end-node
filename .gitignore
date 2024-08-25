@@ -6,6 +6,7 @@ node_modules/
 
 # Environment variables
 .env
+docker-compose.yml
 
 # npm package lock
 package-lock.json
