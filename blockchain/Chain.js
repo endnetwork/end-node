@@ -27,6 +27,11 @@ class Blockchain {
         return crypto.createHash('sha256').update(index + previousHash + timestamp + JSON.stringify(data)).digest('hex');
     }
 
+    async getFullChain() {
+        await this.loadBlockchain(); // Ensure the chain is loaded from the database
+        return this.chain; // Return the full chain
+    }
+
     async getLatestBlock() {
         const latestBlockIndex = this.chain.length - 1;
         return latestBlockIndex >= 0 ? this.chain[latestBlockIndex] : null;

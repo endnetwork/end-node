@@ -15,7 +15,7 @@ function createHTTPServer(port, connected, blockchain, broadcastLatestBlock) {
             } else if (pathname === '/blocks') {
                 // Get all blocks
                 try {
-                    const blocks = await blockchain.getLatestBlock();
+                    const blocks = await blockchain.getFullChain();
                     res.writeHead(200, { 'Content-Type': 'application/json' });
                     res.end(JSON.stringify({blocks}));
                 } catch (error) {
